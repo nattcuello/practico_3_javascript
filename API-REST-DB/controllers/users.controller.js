@@ -75,10 +75,33 @@ const deleteUsuario = async (req, res) => {
     }
 };
 
+// Actualizar rol de usuario
+const updateUsuarioRol = async (req, res) => {
+    try {
+        const usuario = await Usuario.findByPk(req.params.id);
+        if (!usuario) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        const { rol } = req.body;
+        if (!rol) {
+            return res.status(400).json({ message: 'El rol es obligatorio' });
+        }
+
+        usuario.rol = rol;
+        await usuario.save();
+
+        res.json({ status: 200, message: 'Rol actualizado correctamente', data: usuario });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar rol', error: error.message });
+    }
+};
+
 module.exports = {
     getUsuarios,
     getUsuarioById,
     createUsuario,
     updateUsuario,
-    deleteUsuario
+    deleteUsuario,
+    updateUsuarioRol
 };

@@ -1,8 +1,8 @@
 const isAdmin = (req, res, next) => {
-    if (req.userRol !== 'admin') {
-        return res.status(403).json({ message: 'Acceso denegado: se requiere rol admin' })
+    if (req.user.user.rol !== 'admin') {
+        return res.status(403).json({ message: 'Acceso denegado, se requiere rol administrador' });
     }
-    next()
-}
+    next();
+};
 
-module.exports = isAdmin
+module.exports = isAdmin;

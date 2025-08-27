@@ -1,11 +1,11 @@
 {
-  "development": {
-    "username": "root",
-    "password": "root1234",
-    "database": "crud_db",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
+"development": {
+  "username": "natalia",
+  "password": "1234",
+  "database": "crud_db",
+  "host": "127.0.0.1",
+  "dialect": "mysql"
+},  
   "test": {
     "username": "root",
     "password": null,

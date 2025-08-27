@@ -6,35 +6,36 @@ import { useEffect, useState } from "react";
 import { Button } from "primereact/button";
 
 const validationSchema = Yup.object({
-  nombre: Yup.string()
-    .required("El nombre es requerido"),
-
-  contrasenia: Yup.string()
-    .required("La contraseña es requerida")
-    .min(6, "La contraseña debe tener al menos 6 caracteres"),
-
+  nombre: Yup.string().required("El nombre es requerido"),
+  password: Yup.string()
+    .when([], {
+      is: () => true,
+      then: (schema) =>
+        schema.min(6, "La contraseña debe tener al menos 6 caracteres"),
+    }),
   email: Yup.string()
     .email("Debe ser un email válido")
     .required("El email es requerido"),
-
   edad: Yup.number()
     .typeError("La edad debe ser un número")
     .integer("La edad debe ser un número entero")
     .positive("La edad debe ser mayor que 0")
     .required("La edad es requerida"),
+  rol: Yup.string().required("El rol es requerido"),
 });
-
 
 export default function UserForm() {
   const { users, addUser, editUser } = useUserContext();
   const [showPassword, setShowPassword] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [initialValues, setInitialValues] = useState({
     nombre: "",
     email: "",
-    contrasenia: "",
+    password: "",
     edad: 0,
+    rol: "cliente", // valor por defecto
   });
 
   const isEdit = Boolean(id);
@@ -46,20 +47,28 @@ export default function UserForm() {
         setInitialValues({
           nombre: user.nombre || "",
           email: user.email || "",
-          contrasenia: user.contrasenia || "",
           edad: user.edad || 0,
+          password: "",
+          rol: user.rol || "cliente"
         });
       }
     }
-  }, [id, users]);
+  }, [id, users, isEdit]);
 
   const handleSubmit = async (values) => {
-    if (isEdit) {
-      await editUser(Number(id), values);
-    } else {
-      await addUser(values);
+    try {
+      if (isEdit) {
+        await editUser(Number(id), values);
+        alert("Usuario actualizado ✅");
+      } else {
+        await addUser(values);
+        alert("Usuario creado ✅");
+      }
+      navigate("/usuarios");
+    } catch (err) {
+      console.error(err);
+      alert("Error al guardar usuario ❌");
     }
-    navigate("/usuarios");
   };
 
   return (
@@ -95,7 +104,7 @@ export default function UserForm() {
               name="email"
               type="email"
               className="p-inputtext p-component p-mb-3"
-              placeholder="email del usuario"
+              placeholder="Email del usuario"
             />
             <ErrorMessage
               name="email"
@@ -103,31 +112,33 @@ export default function UserForm() {
               className="p-text-danger"
             />
           </div>
-          {!isEdit&&(
-          <div>
-            <label>Contraseña:</label>
-            <div className="p-inputgroup p-mb-1">
-              <Field
-                name="contrasenia"
-                type={showPassword ? "text" : "password"}
-                placeholder="Contraseña del usuario"
-                className="p-inputtext p-component"
+
+          {!isEdit && (
+            <div>
+              <label>Contraseña:</label>
+              <div className="p-inputgroup p-mb-1">
+                <Field
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Contraseña del usuario"
+                  className="p-inputtext p-component"
+                />
+                <span
+                  className="p-inputgroup-addon"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  <i className={`pi ${showPassword ? "pi-eye-slash" : "pi-eye"}`} />
+                </span>
+              </div>
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="p-text-danger"
               />
-              <span
-                className="p-inputgroup-addon"
-                style={{ cursor: "pointer" }}
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                <i className={`pi ${showPassword ? "pi-eye-slash" : "pi-eye"}`} />
-              </span>
             </div>
-            <ErrorMessage
-              name="contrasenia"
-              component="div"
-              className="p-text-danger"
-            />
-          </div>
           )}
+
           <div>
             <label>Edad:</label>
             <Field
@@ -138,6 +149,24 @@ export default function UserForm() {
             />
             <ErrorMessage
               name="edad"
+              component="div"
+              className="p-text-danger"
+            />
+          </div>
+
+          <div>
+            <label>Rol:</label>
+            <Field
+              as="select"
+              name="rol"
+              className="p-inputtext p-component p-mb-3"
+            >
+              <option value="admin">Admin</option>
+              <option value="moderador">Moderador</option>
+              <option value="cliente">Cliente</option>
+            </Field>
+            <ErrorMessage
+              name="rol"
               component="div"
               className="p-text-danger"
             />

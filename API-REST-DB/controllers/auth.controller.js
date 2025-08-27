@@ -5,12 +5,13 @@ const { Usuario } = require('../models');
 const register = async (req, res) => {
 
     const { nombre, email, edad, password, rol } = req.body
-
-    try {
+    
+    try {   
         const userExist = await Usuario.findOne({ where: { email } })
         if (userExist) return res.status(400).json({ message: 'El usuario ya existe' })
-
-        const hashedPassword = await bcrypt.hash(password, 10)
+            
+            const hashedPassword = await bcrypt.hash(password, 10)
+            console.log("hashedPassword", hashedPassword);
         const newUser = await Usuario.create(
             {
                 nombre,
@@ -36,8 +37,6 @@ const login = async (req, res) => {
         const validPassword = await bcrypt.compare(password, userExist.password)
         if (!validPassword) return res.status(403).json({ message: 'Contraseña incorrecta' })
 
-        const token = jwt.sign({ id: userExist.id, rol: userExist.rol }, 'secreto1234', { expiresIn: '1h' })
-
         const user = {
             id: userExist.id,
             nombre: userExist.nombre,
@@ -46,7 +45,10 @@ const login = async (req, res) => {
             rol: userExist.rol
         }
 
-        res.json({ message: 'Inicio de sesion exitoso', token, user: user })
+        const token = jwt.sign({ user: user }, 'secreto1234', { expiresIn: '1h' })
+
+
+        res.json({ message: 'Inicio de sesion exitoso', token })
     } catch (error) {
         res.status(500).json({ status: 500, message: 'Error al loguear el usuario', error: error.message });
     }

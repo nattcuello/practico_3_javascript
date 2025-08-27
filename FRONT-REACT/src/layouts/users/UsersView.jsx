@@ -9,7 +9,7 @@ export default function UsersView() {
   const { users, deleteUser, loading, error } = useUserContext();
 
   const handleExport = () => {
-    exportToPDF(users, 'Usuarios', ['nombre', 'contrasenia', 'email', 'edad']);
+    exportToPDF(users, 'Usuarios', ['nombre', 'password', 'email', 'edad']);
   };
 
   return (
@@ -29,7 +29,7 @@ export default function UsersView() {
       <DataTable value={Array.isArray(users) ? users : []} paginator={false} className="p-datatable-sm p-shadow-2 mt-4">
         <Column field="nombre" header="Nombre" />
         <Column field="email" header="Email" />
-        <Column field="contrasenia" header="Contraseña" body={(rowData) => (<span> {'•'.repeat(rowData?.contrasenia?.length)} </span>)}/>
+        <Column field="password" header="Contraseña" body={(rowData) => (<span> {'•'.repeat(rowData?.password?.length)} </span>)}/>
         <Column field="edad" header="Edad" />
 
         <Column 
@@ -49,7 +49,6 @@ export default function UsersView() {
           )}
         />
       </DataTable>
-      <h5>(sin darme cuenta hice el campo contraseña de más)</h5>
     </div>
   );
 }
